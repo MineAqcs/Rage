@@ -3,6 +3,9 @@ package mine.aqcs.rage.api.event;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.entity.living.LivingEvent;
 
+/**
+ * Triggers when a living entity attacks others with full rage.
+ **/
 public class FullRageAttackEvent extends LivingEvent {
     private final LivingEntity attacked, attacker;
 

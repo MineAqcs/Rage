@@ -30,7 +30,7 @@ public class Rage {
     public Rage() {
         IEventBus forgeBus = MinecraftForge.EVENT_BUS;
         forgeBus.addListener(this::bumpOrUseRageOnAttack);
-        forgeBus.addListener(this::bumpRageOnHurt);
+        forgeBus.addListener(this::bumpRageOnBeingHurt);
         forgeBus.addListener(this::showParticleOnFullRageLiving);
         forgeBus.addListener(this::showParticleOnFullRagePlayer);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG);
@@ -47,12 +47,12 @@ public class Rage {
         BASIC_DAMAGE_BONUS = builder.comment("The entity's damage will be multiplied with this value when its rage is full").defineInRange("BasicDamageBonus", 3.0, 0.0, Double.MAX_VALUE);
         MAX_DAMAGE_BONUS = builder.comment("Extra rage value beyond the full rage will add extra damage bonus, here is the max limit (basic damage bonus included)").defineInRange("MaxDamageBonus", 5.0, 0.0, Double.MAX_VALUE);
         FULL_RAGE_VALUE = builder.comment("How much rage is considered as full").defineInRange("FullRageValue", 150, 0, Integer.MAX_VALUE);
-        GAINED_RAGE_PER_HURT_OR_ATTACK = builder.comment("How much rage will entity get when it attacks/is attacked").defineInRange("GainedRagePerHurtOrAttack", 50, 0, Integer.MAX_VALUE);
+        GAINED_RAGE_PER_HURT_OR_ATTACK = builder.comment("How much rage will entity get when it attacks/is attacked").defineInRange("GainedRageWhenHurtOrAttack", 50, 0, Integer.MAX_VALUE);
         ONLY_PLAYERS_HAVCE_RAGE = builder.comment("When enabled, only players will have rage, other entities' rage value will keep zero").define("OnlyPlayersHaveRage", false);
-        builder.push("Notify");
+        builder.push("Notification");
         SHOW_PARTICLE_ON_FULL_RAGE = builder.comment("Show crit particle around the entity when its rage is full").define("ShowParticleOnFullRage", true);
-        NOTIFY_PLAYER_ON_RAGE_CHANGE = builder.comment("Show a message including the players' currrent rage when it changes on their action bars").define("NotifyPlayerOnRageChange", false);
-        NOTIFY_PLAYER_ON_REACHING_FULL_RAGE = builder.comment("Tell players that their rage is full on theiur action bars").define("NotifyPlayerOnFullRage", true);
+        NOTIFY_PLAYER_ON_RAGE_CHANGE = builder.comment("Show a message including the players' currrent rage on their action bars when it's greatly changed").define("NotifyPlayerOnRageChange", false);
+        NOTIFY_PLAYER_ON_REACHING_FULL_RAGE = builder.comment("Tell players that their rage is full on their action bars").define("NotifyPlayerOnFullRage", true);
         builder.pop();
         builder.push("Sound");
         PLAY_DING_ON_FULL_RAGE_ATTACK = builder.comment("Play Ding sound when entities with full rage attack others").define("PlayDingOnFullRageAttack", true);
@@ -60,8 +60,8 @@ public class Rage {
         DING_PITCH = builder.comment("The pitch of the sound").defineInRange("DingPitch", 1.00, 0.00, Double.MAX_VALUE);
         builder.pop();
         builder.push("Decrease");
-        DECREASE_INTERVAL_TICKS = builder.comment("Between how many ticks the entities' rage will decrease").defineInRange("DecreaseIntervalTicks", 40, 0, Integer.MAX_VALUE);
-        RAGE_THAT_ENTITY_LOSES_EVERY_INTERVAL = builder.comment("How much rage will the entities lose every interval").defineInRange("RageThatEntityLosesEveryInterval", 5, 0, Integer.MAX_VALUE);
+        DECREASE_INTERVAL_TICKS = builder.comment("the entities' rage will decrease per X (default 40) ticks").defineInRange("DecreaseIntervalTicks", 40, 0, Integer.MAX_VALUE);
+        RAGE_THAT_ENTITY_LOSES_EVERY_INTERVAL = builder.comment("the entities will lose X (default 5) rage every interval").defineInRange("RageThatEntityLosesEveryInterval", 5, 0, Integer.MAX_VALUE);
         builder.pop();
         builder.pop();
         CONFIG = builder.build();
@@ -84,7 +84,7 @@ public class Rage {
         }
     }
 
-    private void bumpRageOnHurt(LivingHurtEvent event) {
+    private void bumpRageOnBeingHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntity();
         if (entity.level().isClientSide()) return;
         if (shouldBumpRage(event.getSource())) ((RageHolder)entity).rage$bumpRage();
