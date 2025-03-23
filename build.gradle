@@ -1,67 +1,46 @@
 plugins {
-    id "dev.architectury.loom" version "1.4-SNAPSHOT"
+    id 'dev.architectury.loom' version '1.9-SNAPSHOT'
 }
+
+group = project.maven_group
+version = project.mod_version
 
 base {
-    archivesName = "${archives_base_name}"
+    archivesName = project.archives_name
 }
 
-version = "${minecraft_version}-${mod_version}"
-group = "${maven_group}"
-
-java {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+repositories {
+    maven {
+        name = 'NeoForged'
+        url = 'https://maven.neoforged.net/releases'
+    }
 }
 
 loom {
     silentMojangMappingsLicense()
-    forge {
-        mixinConfigs = [
-            "rage.mixins.json"
-        ]
-    }
-}
-
-repositories {
-    maven { url 'https://jitpack.io' }
-    maven {
-        name 'ParchmentMC'
-        url 'https://maven.parchmentmc.org'
-    }
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.layered() {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
-    }
-    forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    minecraft "net.minecraft:minecraft:$project.minecraft_version"
+    mappings loom.officialMojangMappings()
+    neoForge "net.neoforged:neoforge:$project.neoforge_version"
 }
 
 processResources {
-    inputs.property "version", project.version
-    filesMatching("META-INF/mods.toml") {
-        expand "version": project.version
-    }
-}
+    inputs.property 'version', project.version
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = "UTF-8"
-    options.release.set(8)
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand version: project.version
+    }
 }
 
 java {
     withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
-jar {
-    manifest {
-        attributes([
-                "Implementation-Title"    : archives_base_name,
-                "Implementation-Version"  : mod_version,
-                "Implementation-Vendor"   : mod_author,
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
 }
