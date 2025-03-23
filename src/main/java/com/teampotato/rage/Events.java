@@ -9,7 +9,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -18,12 +17,10 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class Events {
-    @SubscribeEvent
     public static void showParticleOnFullRagePlayer(PlayerTickEvent.Pre event) {
         showParticle(event);
     }
 
-    @SubscribeEvent
     public static void showParticleOnFullRageLiving(EntityTickEvent.Pre event) {
         showParticle(event);
     }
@@ -36,7 +33,6 @@ public class Events {
         }
     }
 
-    @SubscribeEvent
     public static void bumpRageOnBeingHurt(LivingDamageEvent.Post event) {
         LivingEntity entity = event.getEntity();
         if (entity.level().isClientSide()) return;
@@ -49,7 +45,6 @@ public class Events {
         return entity instanceof LivingEntity || directEntity instanceof LivingEntity;
     }
 
-    @SubscribeEvent
     public static void bumpOrConsumeRageOnAttacking(LivingDamageEvent.Pre event) {
         LivingEntity attacked = event.getEntity();
         Level level = attacked.level();

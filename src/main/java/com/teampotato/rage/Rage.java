@@ -5,21 +5,28 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForge;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(Rage.MOD_ID)
 public final class Rage {
     public static final String MOD_ID = "rage";
+    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     public static final ModConfigSpec CONFIG;
 
-    public static ModConfigSpec.DoubleValue maxDamageBonus, basicDamageBonus, dingVolume, dingPitch;
-    public static ModConfigSpec.IntValue fullRageValue, gainedRageOnAttackingOrBeingHurt, decreaseIntervalTicks, entityRageLossPerInterval;
-    public static ModConfigSpec.BooleanValue notifyPlayerOnRageChange, onlyPlayersHaveRage, showParticleOnFullRage, playDingOnFullRageAttack, notifyPlayerOnReachingFullRage;
+    public static final ModConfigSpec.DoubleValue maxDamageBonus, basicDamageBonus, dingVolume, dingPitch;
+    public static final ModConfigSpec.IntValue fullRageValue, gainedRageOnAttackingOrBeingHurt, decreaseIntervalTicks, entityRageLossPerInterval;
+    public static final ModConfigSpec.BooleanValue notifyPlayerOnRageChange, onlyPlayersHaveRage, showParticleOnFullRage, playDingOnFullRageAttack, notifyPlayerOnReachingFullRage;
 
 
     public Rage(ModContainer container) {
+        LOGGER.warn("Hello from Rage!");
         container.registerConfig(ModConfig.Type.COMMON, CONFIG);
-        NeoForge.EVENT_BUS.register(Events.class);
+        NeoForge.EVENT_BUS.addListener(Events::showParticleOnFullRageLiving);
+        NeoForge.EVENT_BUS.addListener(Events::showParticleOnFullRagePlayer);
+        NeoForge.EVENT_BUS.addListener(Events::bumpRageOnBeingHurt);
+        NeoForge.EVENT_BUS.addListener(Events::bumpOrConsumeRageOnAttacking);
     }
 
     static {
@@ -44,7 +51,7 @@ public final class Rage {
         maxDamageBonus = builder.comment("Extra rage value beyond the full rage will add extra damage bonus, here is the max limit (basic damage bonus included)").defineInRange("MaxDamageBonus", 5.0, 0.0, Double.MAX_VALUE);
         builder.pop();
         builder.push("Misc");
-        gainedRageOnAttackingOrBeingHurt = builder.comment("How much rage will entity get when it attacks/is attacked").defineInRange("GainedRageOnAttackingOrBeingHurt", 20, 0, Integer.MAX_VALUE);
+        gainedRageOnAttackingOrBeingHurt = builder.comment("How much rage will entity get when it attacks/is attacked").defineInRange("GainedRageOnAttackingOrBeingHurt", 50, 0, Integer.MAX_VALUE);
         fullRageValue = builder.comment("How much rage is considered as full").defineInRange("FullRageValue", 150, 0, Integer.MAX_VALUE);
         onlyPlayersHaveRage = builder.comment("When enabled, only players will have rage, other entities' rage values will be always zero").define("OnlyPlayersHaveRage", false);
         builder.pop();

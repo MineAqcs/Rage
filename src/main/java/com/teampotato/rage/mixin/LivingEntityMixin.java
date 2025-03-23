@@ -24,7 +24,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
     @Unique private volatile int rage$currentRage;
     @Unique private int rage$decreaseInterval;
     @Unique private static final ResourceLocation PLAYER_ID = ResourceLocation.fromNamespaceAndPath("minecraft", "player");
-    @Unique private final Supplier<Boolean> INVALID_RAGE_HOLER = Suppliers.memoize(() -> !Rage.onlyPlayersHaveRage.get() || PLAYER_ID.equals(BuiltInRegistries.ENTITY_TYPE.getKey(this.getType())));
+    @Unique private final Supplier<Boolean> INVALID_RAGE_HOLER = Suppliers.memoize(() -> !PLAYER_ID.equals(BuiltInRegistries.ENTITY_TYPE.getKey(this.getType())));
 
     public LivingEntityMixin(EntityType<?> arg, Level arg2) {
         super(arg, arg2);
@@ -32,7 +32,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
     @Override
     public int rage$getRage() {
-        if (INVALID_RAGE_HOLER.get()) return 0;
+        if (INVALID_RAGE_HOLER.get() && Rage.onlyPlayersHaveRage.get()) return 0;
         return this.rage$currentRage;
     }
 
