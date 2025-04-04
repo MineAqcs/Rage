@@ -22,4 +22,12 @@ public class FullRageAttackEvent extends LivingEvent {
     public LivingEntity getAttacker() {
         return attacker;
     }
+
+    public float getDamage() {
+        return damage;
+    }
+
+    public float getBonus() {
+        return bonus;
+    }
 }
