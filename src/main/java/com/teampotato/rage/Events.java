@@ -64,10 +64,11 @@ public class Events {
             ((RageHolder)sourceEntity).rage$bumpRage();
             return;
         }
+        double damageBonus = ((RageHolder)sourceEntity).rage$getDamageBonus();
+        float newDamage = (float)(damageBonus * (double) event.getOriginalDamage());
 
-        NeoForge.EVENT_BUS.post(new FullRageAttackEvent(attacked, sourceEntity));
-
-        event.setNewDamage((float) (((RageHolder)sourceEntity).rage$getDamageBonus() * (double) event.getOriginalDamage()));
+        event.setNewDamage(newDamage);
+        NeoForge.EVENT_BUS.post(new FullRageAttackEvent(attacked, sourceEntity, newDamage, (float) damageBonus));
 
         if (Rage.playDingOnFullRageAttack.get()) {
             level.playSound(null, attacked.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, sourceEntity.getSoundSource(), Rage.dingVolume.get().floatValue(), Rage.dingPitch.get().floatValue());
