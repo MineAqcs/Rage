@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -84,7 +85,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
     @Override
     public int rage$getRage() {
-        if (Rage.ONLY_PLAYERS_HAVCE_RAGE.get() && !PLAYER_ID.equals(this.getType().getRegistryName())) return 0;
+        if (Rage.ONLY_PLAYERS_HAVCE_RAGE.get() && !PLAYER_ID.equals(ForgeRegistries.ENTITY_TYPES.getKey(this.getType()))) return 0;
         return this.rage$currentRage;
     }
 

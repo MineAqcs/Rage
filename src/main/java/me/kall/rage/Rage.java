@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,9 +41,9 @@ public class Rage {
 
     public static final ForgeConfigSpec.IntValue WIDTH_OFFSET, HEIGHT_OFFSET;
 
-    public Rage() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG);
-        if (FMLLoader.getDist().isClient()) ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_CONFIG);
+    public Rage(FMLJavaModLoadingContext context) {
+        context.registerConfig(ModConfig.Type.COMMON, CONFIG);
+        if (FMLLoader.getDist().isClient()) context.registerConfig(ModConfig.Type.CLIENT, CLIENT_CONFIG);
     }
 
     static {

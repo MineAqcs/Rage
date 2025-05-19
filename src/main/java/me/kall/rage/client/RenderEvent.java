@@ -4,9 +4,10 @@ import me.kall.rage.Rage;
 import me.kall.rage.api.RageHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -14,8 +15,8 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 @Mod.EventBusSubscriber(modid = Rage.MOD_ID)
 public class RenderEvent {
     @SubscribeEvent
-    public static void renderRage(RenderGameOverlayEvent.Post event) {
-        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT) return;
+    public static void renderRage(RenderGuiOverlayEvent.Post event) {
+        if (event.getOverlay() != VanillaGuiOverlay.DEBUG_TEXT.type()) return;
         Minecraft minecraft = Minecraft.getInstance();
         Player playerEntity = minecraft.player;
         if (playerEntity == null) return;
@@ -23,7 +24,7 @@ public class RenderEvent {
         if (player == null) return;
         int currentRage = ((RageHolder)player).rage$getRage();
 
-        TranslatableComponent component = new TranslatableComponent("rage.current_rage", currentRage);
+        Component component = Component.translatable("rage.current_rage", currentRage);
         Font fontRenderer = minecraft.font;
 
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
@@ -33,9 +34,9 @@ public class RenderEvent {
         int y = screenHeight - Rage.HEIGHT_OFFSET.get();
 
         if (!((RageHolder)player).rage$isFullRage()) {
-            fontRenderer.draw(event.getMatrixStack(), component, x, y, 0xFFFFFF);
+            fontRenderer.draw(event.getPoseStack(), component, x, y, 0xFFFFFF);
         } else {
-            fontRenderer.draw(event.getMatrixStack(), component, x, y, 0x8B0000);
+            fontRenderer.draw(event.getPoseStack(), component, x, y, 0x8B0000);
         }
     }
 }
