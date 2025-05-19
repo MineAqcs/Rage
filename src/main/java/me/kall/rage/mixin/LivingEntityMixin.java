@@ -42,7 +42,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
                 pAmount = (float) (damageBonus * pAmount);
                 ((RageHolder)entity).rage$setRage(0);
                 if (Rage.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
-                    this.level.playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, entity.getSoundSource(), Rage.DING_VOLUME.get().floatValue(), Rage.DING_PITCH.get().floatValue());
+                    this.level().playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, entity.getSoundSource(), Rage.DING_VOLUME.get().floatValue(), Rage.DING_PITCH.get().floatValue());
                 }
             } else {
                 ((RageHolder)entity).rage$setRage(((RageHolder)entity).rage$getRage() + Rage.GAINED_RAGE_ON_ATTACKING.get());
@@ -57,7 +57,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
                 pAmount = (float) (damageBonus * pAmount);
                 ((RageHolder)directEntity).rage$setRage(0);
                 if (Rage.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
-                    this.level.playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, directEntity.getSoundSource(), Rage.DING_VOLUME.get().floatValue(), Rage.DING_PITCH.get().floatValue());
+                    this.level().playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, directEntity.getSoundSource(), Rage.DING_VOLUME.get().floatValue(), Rage.DING_PITCH.get().floatValue());
                 }
             } else {
                 ((RageHolder)directEntity).rage$setRage(((RageHolder)directEntity).rage$getRage() + Rage.GAINED_RAGE_ON_ATTACKING.get());
@@ -69,7 +69,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void rage$onTick(CallbackInfo ci) {
-        if (this.level instanceof ServerLevel serverWorld) {
+        if (this.level() instanceof ServerLevel serverWorld) {
             this.rage$decreaseInterval += 1;
             if (this.rage$decreaseInterval == Rage.DECREASE_INTERVAL_TICKS.get()) {
                 this.rage$decreaseInterval = 0;
