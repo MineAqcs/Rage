@@ -29,8 +29,8 @@ public class RenderEvent {
         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
         int textWidth = fontRenderer.width(textComponent);
-        int x = screenWidth - textWidth - 5;
-        int y = screenHeight - 20;
+        int x = screenWidth - textWidth - Rage.WIDTH_OFFSET.get();
+        int y = screenHeight - Rage.HEIGHT_OFFSET.get();
 
         if (!((RageHolder)player).rage$isFullRage()) {
             fontRenderer.draw(event.getMatrixStack(), textComponent, x, y, 0xFFFFFF);

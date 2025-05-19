@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,8 +36,22 @@ public class Rage {
             DECREASE_INTERVAL_TICKS,
             RAGE_THAT_ENTITY_LOSES_EVERY_INTERVAL;
 
+    public static final ForgeConfigSpec CLIENT_CONFIG;
+
+    public static final ForgeConfigSpec.IntValue WIDTH_OFFSET, HEIGHT_OFFSET;
+
     public Rage() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG);
+        if (FMLLoader.getDist().isClient()) ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_CONFIG);
+    }
+
+    static {
+        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        builder.push("RageClient");
+        WIDTH_OFFSET = builder.comment("Offset from your game's right border").defineInRange("WidthOffset", 5, 0, Integer.MAX_VALUE);
+        HEIGHT_OFFSET = builder.comment("Offset from your game's botton border").defineInRange("HeightOffset", 20, 0, Integer.MAX_VALUE);
+        builder.pop();
+        CLIENT_CONFIG = builder.build();
     }
 
     static {
