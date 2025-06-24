@@ -51,7 +51,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
         if (directEntity instanceof LivingEntity) {
             if (((RageHolder)directEntity).rage$isFullRage()) {
-                double damageBonus = ((RageHolder)directEntity).rage$getDamageBonus() + 1;
+                double damageBonus = ((RageHolder)directEntity).rage$getDamageBonus();
                 pAmount = (float) (damageBonus * pAmount);
                 ((RageHolder)directEntity).rage$setRage(0);
                 if (Rage.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
