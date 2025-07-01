@@ -21,7 +21,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements RageHold
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void rage$onTick(CallbackInfo ci) {
-        if (Rage.Config.SHOW_PARTICLE_ON_FULL_RAGE.get() && this.rage$isFullRage() && this.level instanceof ServerLevel serverWorld) {
+        if (Rage.Config.SHOW_PARTICLE_ON_FULL_RAGE.get() && this.rage$isFullRage() && this.level instanceof ServerLevel) {
+            ServerLevel serverWorld = (ServerLevel) this.level;;
             serverWorld.sendParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 8, 0.2, 0.2, 0.2, 0.0);
         }
     }
