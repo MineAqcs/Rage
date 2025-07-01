@@ -4,7 +4,7 @@
   "plugin": "me.kall.rage.mixin.MixinExtrasInitializer",
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.8",
-  "refmap": "rage.refmap.json",
+  "refmap": "rage-refmap.json",
   "mixins": [
     "LivingEntityMixin",
     "PlayerEntityMixin"

@@ -1,119 +1,88 @@
 plugins {
-    id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'dev.architectury.loom' version '1.10-SNAPSHOT'
     id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
-version = mod_version
-group = mod_group_id
+group = project.maven_group
+version = project.minecraft_version + "-" + project.mod_version
+
+configurations {
+    shadow
+    implementation.extendsFrom(shadow)
+}
 
 base {
-    archivesName = mod_id
+    archivesName = project.archives_name
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+loom {
+    silentMojangMappingsLicense()
 
-mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
+    forge {
+        mixinConfig 'rage.mixins.json'
+    }
 }
 
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
-    copyIdeResources = true
-    
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    runs {
-        configureEach {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            
-            property 'forge.logging.console.level', 'info'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        client {
-            
-        }
-
-        server {
-            args '--nogui'
-        }
-
-        data {
-            workingDirectory project.file('run-data')
-
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+repositories {
+    maven {
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org'
+    }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
         }
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-repositories {
-    maven { url = 'https://maven.parchmentmc.org' }
-}
-
-configurations {
-    implementation.extendsFrom shadow
-}
-
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    shadow(annotationProcessor("io.github.llamalad7:mixinextras-common:0.2.0"))
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    minecraft "net.minecraft:minecraft:$project.minecraft_version"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${project.minecraft_version}:${project.parchment_version}@zip")
+    }
+    forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+    shadow(annotationProcessor("io.github.llamalad7:mixinextras-common:${project.mixinextras_version}"))
 }
 
 shadowJar {
     configurations = [project.configurations.shadow]
-    relocate("com.llamalad7.mixinextras", "me.kall.rage.mixinextras")
-    mergeServiceFiles() // Very important!
+    relocate "com.llamalad7.mixinextras", "me.kall.rage.mixinextras"
+    mergeServiceFiles()
+
+    archiveClassifier = "dev-shadow"
 }
 
-tasks.named('processResources', ProcessResources).configure {
-    var replaceProperties = [
-            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version: forge_version, forge_version_range: forge_version_range,
-            loader_version_range: loader_version_range,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description,
-    ]
-    inputs.properties replaceProperties
+processResources {
+    inputs.property 'version', project.version
 
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
+    filesMatching('META-INF/mods.toml') {
+        expand version: project.version
     }
 }
 
-// Example for how to get properties into the manifest for reading at runtime.
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1',
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs": "${mod_id}.mixins.json"
-        ])
+java {
+    if (version.startsWith("1.16.5")) {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    } else {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    finalizedBy 'reobfJar'
 }
 
-reobf {
-    shadowJar { }
+remapJar {
+    dependsOn shadowJar
+    inputFile = shadowJar.archiveFile
+    archiveClassifier = null
 }
-
-build.dependsOn shadowJar
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+    if (version.startsWith("1.16.5")) {
+        it.options.release = 8
+    } else {
+        it.options.release = 17
+    }
 }

@@ -3,35 +3,41 @@ package me.kall.rage.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.kall.rage.Rage;
 import me.kall.rage.api.RageHolder;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import javax.annotation.Nullable;
+
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements RageHolder {
-    public LivingEntityMixin(EntityType<?> pType, World pLevel) {
-        super(pType, pLevel);
-    }
+    @Shadow @Nullable public abstract AttributeInstance getAttribute(Attribute attribute);
 
-    @Unique private volatile int rage$currentRage;
     @Unique private int rage$decreaseInterval;
     @Unique private static final ResourceLocation PLAYER_ID = new ResourceLocation("minecraft:player");
 
+    public LivingEntityMixin(EntityType<?> arg, Level arg2) {
+        super(arg, arg2);
+    }
+
     @ModifyVariable(method = "hurt", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private float rage$onHurt(float pAmount, @Local(argsOnly = true) DamageSource pSource) {
-        this.rage$setRage(this.rage$getRage() + Rage.GAINED_RAGE_ON_BEING_ATTACKED.get());
+        this.rage$setRage(this.rage$getRage() + Rage.Config.GAINED_RAGE_ON_BEING_ATTACKED.get());
         Entity entity = pSource.getEntity();
         Entity directEntity = pSource.getDirectEntity();
         if (entity instanceof LivingEntity) {
@@ -39,11 +45,11 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
                 double damageBonus = ((RageHolder)entity).rage$getDamageBonus();
                 pAmount = (float) (damageBonus * pAmount);
                 ((RageHolder)entity).rage$setRage(0);
-                if (Rage.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
-                    this.level.playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, entity.getSoundSource(), Rage.DING_VOLUME.get().floatValue(), Rage.DING_PITCH.get().floatValue());
+                if (Rage.Config.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
+                    this.level.playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, entity.getSoundSource(), Rage.Config.DING_VOLUME.get().floatValue(), Rage.Config.DING_PITCH.get().floatValue());
                 }
             } else {
-                ((RageHolder)entity).rage$setRage(((RageHolder)entity).rage$getRage() + Rage.GAINED_RAGE_ON_ATTACKING.get());
+                ((RageHolder)entity).rage$setRage(((RageHolder)entity).rage$getRage() + Rage.Config.GAINED_RAGE_ON_ATTACKING.get());
             }
         }
 
@@ -54,11 +60,11 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
                 double damageBonus = ((RageHolder)directEntity).rage$getDamageBonus();
                 pAmount = (float) (damageBonus * pAmount);
                 ((RageHolder)directEntity).rage$setRage(0);
-                if (Rage.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
-                    this.level.playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, directEntity.getSoundSource(), Rage.DING_VOLUME.get().floatValue(), Rage.DING_PITCH.get().floatValue());
+                if (Rage.Config.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
+                    this.level.playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, directEntity.getSoundSource(), Rage.Config.DING_VOLUME.get().floatValue(), Rage.Config.DING_PITCH.get().floatValue());
                 }
             } else {
-                ((RageHolder)directEntity).rage$setRage(((RageHolder)directEntity).rage$getRage() + Rage.GAINED_RAGE_ON_ATTACKING.get());
+                ((RageHolder)directEntity).rage$setRage(((RageHolder)directEntity).rage$getRage() + Rage.Config.GAINED_RAGE_ON_ATTACKING.get());
             }
         }
 
@@ -67,29 +73,31 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void rage$onTick(CallbackInfo ci) {
-        if (this.level instanceof ServerWorld) {
+        if (this.level instanceof ServerLevel) {
             this.rage$decreaseInterval += 1;
-            if (this.rage$decreaseInterval == Rage.DECREASE_INTERVAL_TICKS.get()) {
+            if (this.rage$decreaseInterval == Rage.Config.DECREASE_INTERVAL_TICKS.get()) {
                 this.rage$decreaseInterval = 0;
-                int lost = Rage.RAGE_THAT_ENTITY_LOSES_EVERY_INTERVAL.get();
-                this.rage$currentRage = lost >= this.rage$getRage() ? 0 : this.rage$getRage() - lost;
+                int lost = Rage.Config.RAGE_THAT_ENTITY_LOSES_EVERY_INTERVAL.get();
+                this.rage$setRage(lost >= this.rage$getRage() ? 0 : this.rage$getRage() - lost);
             }
 
-            if (Rage.SHOW_PARTICLE_ON_FULL_RAGE.get() && this.rage$isFullRage()) {
-                ServerWorld serverWorld = (ServerWorld) this.level;
+            if (Rage.Config.SHOW_PARTICLE_ON_FULL_RAGE.get() && this.rage$isFullRage()) {
+                ServerLevel serverWorld = (ServerLevel) this.level;
                 serverWorld.sendParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 8, 0.2, 0.2, 0.2, 0.0);
             }
         }
     }
 
     @Override
+    @SuppressWarnings("DataFlowIssue")
     public int rage$getRage() {
-        if (Rage.ONLY_PLAYERS_HAVCE_RAGE.get() && !PLAYER_ID.equals(this.getType().getRegistryName())) return 0;
-        return this.rage$currentRage;
+        if (Rage.Config.ONLY_PLAYERS_HAVCE_RAGE.get() && !PLAYER_ID.equals(this.getType().getRegistryName())) return 0;
+        return (int) this.getAttribute(Rage.RAGE.get()).getBaseValue();
     }
 
     @Override
+    @SuppressWarnings("DataFlowIssue")
     public void rage$setRage(int newRage) {
-        this.rage$currentRage = newRage;
+        this.getAttribute(Rage.RAGE.get()).setBaseValue(newRage);
     }
 }

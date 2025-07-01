@@ -8,13 +8,13 @@ public interface RageHolder {
     void rage$setRage(int newRage);
 
     default boolean rage$isFullRage() {
-        return this.rage$getRage() >= Rage.FULL_RAGE_VALUE.get();
+        return this.rage$getRage() >= Rage.Config.FULL_RAGE_VALUE.get();
     }
 
     default double rage$getDamageBonus() {
-        double bonus = Rage.BASIC_DAMAGE_BONUS.get();
-        bonus += ((double)this.rage$getRage() - Rage.FULL_RAGE_VALUE.get().doubleValue()) / 100D;
-        if (bonus > Rage.MAX_DAMAGE_BONUS.get()) bonus = Rage.MAX_DAMAGE_BONUS.get();
+        double bonus = Rage.Config.BASIC_DAMAGE_BONUS.get();
+        bonus += ((double)this.rage$getRage() - Rage.Config.FULL_RAGE_VALUE.get().doubleValue()) / 100D;
+        if (bonus > Rage.Config.MAX_DAMAGE_BONUS.get()) bonus = Rage.Config.MAX_DAMAGE_BONUS.get();
         return bonus;
     }
 }
