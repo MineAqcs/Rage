@@ -29,7 +29,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
     @Shadow @Nullable public abstract AttributeInstance getAttribute(Attribute attribute);
 
     @Unique private int rage$decreaseInterval;
-    @Unique private static final ResourceLocation PLAYER_ID = new ResourceLocation("minecraft:player");
+    @Unique private static final ResourceLocation PLAYER_ID = ResourceLocation.parse("minecraft:player");
 
     public LivingEntityMixin(EntityType<?> arg, Level arg2) {
         super(arg, arg2);
@@ -73,7 +73,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void rage$onTick(CallbackInfo ci) {
-        if (this.level instanceof ServerLevel) {
+        if (this.level instanceof ServerLevel serverWorld) {
             this.rage$decreaseInterval += 1;
             if (this.rage$decreaseInterval == Rage.Config.DECREASE_INTERVAL_TICKS.get()) {
                 this.rage$decreaseInterval = 0;
@@ -82,7 +82,6 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
             }
 
             if (Rage.Config.SHOW_PARTICLE_ON_FULL_RAGE.get() && this.rage$isFullRage()) {
-                ServerLevel serverWorld = (ServerLevel) this.level;
                 serverWorld.sendParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 8, 0.2, 0.2, 0.2, 0.0);
             }
         }
