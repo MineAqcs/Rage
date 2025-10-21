@@ -30,7 +30,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
     @Shadow @Nullable public abstract AttributeInstance getAttribute(Attribute attribute);
 
     @Unique private int rage$decreaseInterval;
-    @Unique private static final ResourceLocation PLAYER_ID = new ResourceLocation("minecraft:player");
+    @Unique private static final ResourceLocation PLAYER_ID = ResourceLocation.parse("minecraft:player");
 
     public LivingEntityMixin(EntityType<?> arg, Level arg2) {
         super(arg, arg2);
