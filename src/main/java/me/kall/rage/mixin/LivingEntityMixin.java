@@ -48,7 +48,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
                 pAmount = (float) (damageBonus * pAmount);
                 ((RageHolder)entity).rage$setRage(0);
                 if (Rage.Config.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
-                    this.level.playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, entity.getSoundSource(), Rage.Config.DING_VOLUME.get().floatValue(), Rage.Config.DING_PITCH.get().floatValue());
+                    this.level().playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, entity.getSoundSource(), Rage.Config.DING_VOLUME.get().floatValue(), Rage.Config.DING_PITCH.get().floatValue());
                 }
             } else {
                 ((RageHolder)entity).rage$setRage(((RageHolder)entity).rage$getRage() + Rage.Config.GAINED_RAGE_ON_ATTACKING.get());
@@ -63,7 +63,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
                 pAmount = (float) (damageBonus * pAmount);
                 ((RageHolder)directEntity).rage$setRage(0);
                 if (Rage.Config.PLAY_DING_ON_FULL_RAGE_ATTACK.get()) {
-                    this.level.playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, directEntity.getSoundSource(), Rage.Config.DING_VOLUME.get().floatValue(), Rage.Config.DING_PITCH.get().floatValue());
+                    this.level().playSound(null, this.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, directEntity.getSoundSource(), Rage.Config.DING_VOLUME.get().floatValue(), Rage.Config.DING_PITCH.get().floatValue());
                 }
             } else {
                 ((RageHolder)directEntity).rage$setRage(((RageHolder)directEntity).rage$getRage() + Rage.Config.GAINED_RAGE_ON_ATTACKING.get());
@@ -75,7 +75,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void rage$onTick(CallbackInfo ci) {
-        if (this.level instanceof ServerLevel) {
+        if (this.level() instanceof ServerLevel) {
             this.rage$decreaseInterval += 1;
             if (this.rage$decreaseInterval == Rage.Config.DECREASE_INTERVAL_TICKS.get()) {
                 this.rage$decreaseInterval = 0;
@@ -84,7 +84,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
             }
 
             if (Rage.Config.SHOW_PARTICLE_ON_FULL_RAGE.get() && this.rage$isFullRage()) {
-                ServerLevel serverWorld = (ServerLevel) this.level;;
+                ServerLevel serverWorld = (ServerLevel) this.level();;
                 serverWorld.sendParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 8, 0.2, 0.2, 0.2, 0.0);
             }
         }

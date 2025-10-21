@@ -32,9 +32,9 @@ public class RenderEvent {
         int y = screenHeight - Rage.Config.HEIGHT_OFFSET.get();
 
         if (!((RageHolder)playerEntity).rage$isFullRage()) {
-            fontRenderer.draw(event.getPoseStack(), textComponent, x, y, 0xFFFFFF);
+            event.getGuiGraphics().drawString(fontRenderer, textComponent, x, y, 0xFFFFFF);
         } else {
-            fontRenderer.draw(event.getPoseStack(), textComponent, x, y, 0x8B0000);
+            event.getGuiGraphics().drawString(fontRenderer, textComponent, x, y, 0x8B0000);
         }
     }
 }
