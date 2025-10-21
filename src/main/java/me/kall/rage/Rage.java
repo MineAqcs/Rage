@@ -11,13 +11,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(Rage.MOD_ID)
 public class Rage {
-    private static final Logger LOGGER = LogManager.getLogger();
-
     public static final String MOD_ID = "rage";
 
     public static final DeferredRegister<Attribute> REGISTER = DeferredRegister.create(ForgeRegistries.ATTRIBUTES, MOD_ID);
@@ -33,7 +29,7 @@ public class Rage {
 
     public static class Config {
         public static final ForgeConfigSpec.BooleanValue NOTIFY_PLAYER_ON_RAGE_CHANGE;
-        public static final ForgeConfigSpec.BooleanValue ONLY_PLAYERS_HAVCE_RAGE;
+        public static final ForgeConfigSpec.BooleanValue ONLY_PLAYERS_HAVE_RAGE;
         public static final ForgeConfigSpec.BooleanValue SHOW_PARTICLE_ON_FULL_RAGE;
         public static final ForgeConfigSpec.BooleanValue PLAY_DING_ON_FULL_RAGE_ATTACK;
         public static final ForgeConfigSpec.BooleanValue NOTIFY_PLAYER_ON_REACHING_FULL_RAGE;
@@ -55,7 +51,7 @@ public class Rage {
             ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
             builder.push("RageClient");
             WIDTH_OFFSET = builder.comment("Offset from your game's right border").defineInRange("WidthOffset", 5, 0, Integer.MAX_VALUE);
-            HEIGHT_OFFSET = builder.comment("Offset from your game's botton border").defineInRange("HeightOffset", 20, 0, Integer.MAX_VALUE);
+            HEIGHT_OFFSET = builder.comment("Offset from your game's bottom border").defineInRange("HeightOffset", 20, 0, Integer.MAX_VALUE);
             builder.pop();
             CLIENT_CONFIG = builder.build();
         }
@@ -68,7 +64,7 @@ public class Rage {
             FULL_RAGE_VALUE = builder.comment("How much rage is considered as full").defineInRange("FullRageValue", 150, 0, Integer.MAX_VALUE);
             GAINED_RAGE_ON_ATTACKING = builder.comment("How much rage will entity get when it attacks").defineInRange("GainedRageOnAttacking", 50, 0, Integer.MAX_VALUE);
             GAINED_RAGE_ON_BEING_ATTACKED = builder.comment("How much rage will entity get when it is attacked").defineInRange("GainedRageOnBeingAttacked", 20, 0, Integer.MAX_VALUE);
-            ONLY_PLAYERS_HAVCE_RAGE = builder.comment("When enabled, only players will have rage, other entities' rage value will keep zero").define("OnlyPlayersHaveRage", false);
+            ONLY_PLAYERS_HAVE_RAGE = builder.comment("When enabled, only players will have rage, other entities' rage value will keep zero").define("OnlyPlayersHaveRage", false);
             builder.push("Notify");
             SHOW_PARTICLE_ON_FULL_RAGE = builder.comment("Show crit particle around the entity when its rage is full").define("ShowParticleOnFullRage", true);
             NOTIFY_PLAYER_ON_RAGE_CHANGE = builder.comment("Show a message including the players' currrent rage when it changes on their action bars").define("NotifyPlayerOnRageChange", false);

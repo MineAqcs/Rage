@@ -3,13 +3,15 @@
   "package": "me.kall.rage.mixin",
   "plugin": "me.kall.rage.mixin.MixinExtrasInitializer",
   "compatibilityLevel": "JAVA_8",
+  "overwrites": {
+    "conformVisibility": false
+  },
   "minVersion": "0.8",
-  "refmap": "rage-refmap.json",
+  "client": [
+  ],
   "mixins": [
     "LivingEntityMixin",
     "PlayerEntityMixin"
-  ],
-  "client": [
   ],
   "injectors": {
     "defaultRequire": 1

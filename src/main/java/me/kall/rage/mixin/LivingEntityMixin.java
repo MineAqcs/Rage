@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements RageHolder {
@@ -89,15 +90,18 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
     }
 
     @Override
-    @SuppressWarnings("DataFlowIssue")
     public int rage$getRage() {
-        if (Rage.Config.ONLY_PLAYERS_HAVCE_RAGE.get() && !PLAYER_ID.equals(this.getType().getRegistryName())) return 0;
-        return (int) this.getAttribute(Rage.RAGE.get()).getBaseValue();
+        if (Rage.Config.ONLY_PLAYERS_HAVE_RAGE.get() && !PLAYER_ID.equals(this.getType().getRegistryName())) return 0;
+        return this.rage$getAttribute().map(instance -> (int) instance.getBaseValue()).orElse(0);
     }
 
     @Override
-    @SuppressWarnings("DataFlowIssue")
     public void rage$setRage(int newRage) {
-        this.getAttribute(Rage.RAGE.get()).setBaseValue(newRage);
+        this.rage$getAttribute().ifPresent(attributeInstance -> attributeInstance.setBaseValue(newRage));
+    }
+
+    @Unique
+    private Optional<AttributeInstance> rage$getAttribute() {
+        return Optional.ofNullable(this.getAttribute(Rage.RAGE.get()));
     }
 }
