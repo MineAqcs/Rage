@@ -6,17 +6,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import org.jetbrains.annotations.NotNull;
 
-@Mod.EventBusSubscriber(modid = Rage.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Rage.MOD_ID, value = Dist.CLIENT)
 public class RenderEvent {
     @SubscribeEvent
-    public static void renderRage(RenderGuiOverlayEvent.Post event) {
-        if (event.getOverlay() != VanillaGuiOverlay.HOTBAR.type()) return;
+    public static void renderRage(RenderGuiLayerEvent.@NotNull Post event) {
+        if (event.getName() != VanillaGuiLayers.HOTBAR) return;
         Minecraft minecraft = Minecraft.getInstance();
         Player playerEntity = minecraft.player;
         if (playerEntity == null) return;

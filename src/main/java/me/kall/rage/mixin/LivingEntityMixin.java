@@ -3,7 +3,9 @@ package me.kall.rage.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.kall.rage.Rage;
 import me.kall.rage.api.RageHolder;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -14,7 +16,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -28,7 +29,8 @@ import java.util.Optional;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements RageHolder {
-    @Shadow @Nullable public abstract AttributeInstance getAttribute(Attribute attribute);
+
+    @Shadow @Nullable public abstract AttributeInstance getAttribute(Holder<Attribute> attribute);
 
     @Unique private int rage$decreaseInterval;
     @Unique private static final ResourceLocation PLAYER_ID = ResourceLocation.parse("minecraft:player");
@@ -92,7 +94,7 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
     @Override
     public int rage$getRage() {
-        if (Rage.Config.ONLY_PLAYERS_HAVE_RAGE.get() && !PLAYER_ID.equals(ForgeRegistries.ENTITY_TYPES.getKey(this.getType()))) return 0;
+        if (Rage.Config.ONLY_PLAYERS_HAVE_RAGE.get() && !PLAYER_ID.equals(BuiltInRegistries.ENTITY_TYPE.getKey(this.getType()))) return 0;
         return this.rage$getAttribute().map(instance -> (int) instance.getBaseValue()).orElse(0);
     }
 
@@ -103,6 +105,6 @@ public abstract class LivingEntityMixin extends Entity implements RageHolder {
 
     @Unique
     private Optional<AttributeInstance> rage$getAttribute() {
-        return Optional.ofNullable(this.getAttribute(Rage.RAGE.get()));
+        return Optional.ofNullable(this.getAttribute(Rage.RAGE.getDelegate()));
     }
 }

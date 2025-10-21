@@ -1,53 +1,54 @@
 package me.kall.rage;
 
 import me.kall.rage.attribute.RageAttribute;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 @Mod(Rage.MOD_ID)
 public class Rage {
     public static final String MOD_ID = "rage";
 
-    public static final DeferredRegister<Attribute> REGISTER = DeferredRegister.create(ForgeRegistries.ATTRIBUTES, MOD_ID);
-    public static final RegistryObject<Attribute> RAGE = REGISTER.register(MOD_ID, RageAttribute::new);
+    public static final DeferredRegister<Attribute> REGISTER = DeferredRegister.create(BuiltInRegistries.ATTRIBUTE, MOD_ID);
+    public static final DeferredHolder<Attribute, Attribute> RAGE = REGISTER.register(MOD_ID, RageAttribute::new);
 
-    public Rage(FMLJavaModLoadingContext context) {
-        context.registerConfig(ModConfig.Type.COMMON, Config.CONFIG);
-        REGISTER.register(context.getModEventBus());
-        if (FMLLoader.getDist().isClient()) {
-            context.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
+    public Rage(IEventBus modBus, Dist dist, ModContainer container) {
+        container.registerConfig(ModConfig.Type.COMMON, Config.CONFIG);
+        REGISTER.register(modBus);
+        if (dist.isClient()) {
+            container.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
         }
     }
 
     public static class Config {
-        public static final ForgeConfigSpec.BooleanValue NOTIFY_PLAYER_ON_RAGE_CHANGE;
-        public static final ForgeConfigSpec.BooleanValue ONLY_PLAYERS_HAVE_RAGE;
-        public static final ForgeConfigSpec.BooleanValue SHOW_PARTICLE_ON_FULL_RAGE;
-        public static final ForgeConfigSpec.BooleanValue PLAY_DING_ON_FULL_RAGE_ATTACK;
-        public static final ForgeConfigSpec.BooleanValue NOTIFY_PLAYER_ON_REACHING_FULL_RAGE;
-        public static final ForgeConfigSpec.DoubleValue MAX_DAMAGE_BONUS;
-        public static final ForgeConfigSpec.DoubleValue BASIC_DAMAGE_BONUS;
-        public static final ForgeConfigSpec.DoubleValue DING_VOLUME;
-        public static final ForgeConfigSpec.DoubleValue DING_PITCH;
-        public static final ForgeConfigSpec.IntValue FULL_RAGE_VALUE;
-        public static final ForgeConfigSpec.IntValue GAINED_RAGE_ON_ATTACKING;
-        public static final ForgeConfigSpec.IntValue GAINED_RAGE_ON_BEING_ATTACKED;
-        public static final ForgeConfigSpec.IntValue DECREASE_INTERVAL_TICKS;
-        public static final ForgeConfigSpec.IntValue RAGE_THAT_ENTITY_LOSES_EVERY_INTERVAL;
-        public static final ForgeConfigSpec CLIENT_CONFIG;
-        public static final ForgeConfigSpec.IntValue WIDTH_OFFSET;
-        public static final ForgeConfigSpec.IntValue HEIGHT_OFFSET;
-        public static final ForgeConfigSpec CONFIG;
+        public static final ModConfigSpec.BooleanValue NOTIFY_PLAYER_ON_RAGE_CHANGE;
+        public static final ModConfigSpec.BooleanValue ONLY_PLAYERS_HAVE_RAGE;
+        public static final ModConfigSpec.BooleanValue SHOW_PARTICLE_ON_FULL_RAGE;
+        public static final ModConfigSpec.BooleanValue PLAY_DING_ON_FULL_RAGE_ATTACK;
+        public static final ModConfigSpec.BooleanValue NOTIFY_PLAYER_ON_REACHING_FULL_RAGE;
+        public static final ModConfigSpec.DoubleValue MAX_DAMAGE_BONUS;
+        public static final ModConfigSpec.DoubleValue BASIC_DAMAGE_BONUS;
+        public static final ModConfigSpec.DoubleValue DING_VOLUME;
+        public static final ModConfigSpec.DoubleValue DING_PITCH;
+        public static final ModConfigSpec.IntValue FULL_RAGE_VALUE;
+        public static final ModConfigSpec.IntValue GAINED_RAGE_ON_ATTACKING;
+        public static final ModConfigSpec.IntValue GAINED_RAGE_ON_BEING_ATTACKED;
+        public static final ModConfigSpec.IntValue DECREASE_INTERVAL_TICKS;
+        public static final ModConfigSpec.IntValue RAGE_THAT_ENTITY_LOSES_EVERY_INTERVAL;
+        public static final ModConfigSpec CLIENT_CONFIG;
+        public static final ModConfigSpec.IntValue WIDTH_OFFSET;
+        public static final ModConfigSpec.IntValue HEIGHT_OFFSET;
+        public static final ModConfigSpec CONFIG;
 
         static {
-            ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+            ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
             builder.push("RageClient");
             WIDTH_OFFSET = builder.comment("Offset from your game's right border").defineInRange("WidthOffset", 5, 0, Integer.MAX_VALUE);
             HEIGHT_OFFSET = builder.comment("Offset from your game's bottom border").defineInRange("HeightOffset", 20, 0, Integer.MAX_VALUE);
@@ -56,7 +57,7 @@ public class Rage {
         }
 
         static {
-            ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+            ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
             builder.push("Rage");
             BASIC_DAMAGE_BONUS = builder.comment("The entity's damage will be multiplied with this value when its rage is full").defineInRange("BasicDamageBonus", 3.0, 0.0, Double.MAX_VALUE);
             MAX_DAMAGE_BONUS = builder.comment("Extra rage value beyond the full rage will add extra damage bonus, here is the max limit (basic damage bonus included)").defineInRange("MaxDamageBonus", 5.0, 0.0, Double.MAX_VALUE);
