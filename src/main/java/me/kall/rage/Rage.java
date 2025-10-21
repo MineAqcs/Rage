@@ -3,7 +3,6 @@ package me.kall.rage;
 import me.kall.rage.attribute.RageAttribute;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -19,11 +18,11 @@ public class Rage {
     public static final DeferredRegister<Attribute> REGISTER = DeferredRegister.create(ForgeRegistries.ATTRIBUTES, MOD_ID);
     public static final RegistryObject<Attribute> RAGE = REGISTER.register(MOD_ID, RageAttribute::new);
 
-    public Rage() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.CONFIG);
-        REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
+    public Rage(FMLJavaModLoadingContext context) {
+        context.registerConfig(ModConfig.Type.COMMON, Config.CONFIG);
+        REGISTER.register(context.getModEventBus());
         if (FMLLoader.getDist().isClient()) {
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
+            context.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
         }
     }
 
